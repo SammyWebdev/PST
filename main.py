@@ -17,7 +17,7 @@ search_radius = 500
 max_search_radius = 2000
 
 # user id's (or search id's)
-uids = {}
+uids = {3870914569}
 
 results = {}  # dict<uid: query_result["elements"]>
 
@@ -60,7 +60,7 @@ for uid in uids:
         else result["elements"]
     )
 
-print(type(results), results)
+print(json.dumps(results, indent=2))
 
 # geopandas visualisation
 # gdf = geopandas.read_file(resuts.json())

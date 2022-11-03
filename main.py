@@ -4,7 +4,7 @@
 #
 #   Die Ergebnisse sind in dem dict <results> nach key=uid.
 #
-#   Der Methodenaufruf <print_per_uid_ptty(name=True)> ist nicht notwendig und nur zur veranschaulichung der erhaltenen Daten.
+#   Der Methodenaufruf <print_per_uid_ptty(name=True)> ist nicht notwendig und nur zur Veranschaulichung der erhaltenen Daten.
 # ----------------------------------------------------------------------------------
 
 

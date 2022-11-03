@@ -9,7 +9,6 @@
 
 
 # TODO fixes:
-# - atm overpass still (sometimes) returns the same thing multiple times...
 # - somethings I've missed :)
 
 print("\n\n" + "<" + "=" * 150 + ">")
@@ -43,18 +42,17 @@ for uid in uids:
     while search_radius < max_search_radius:
         overpass_query = """
         [out:json][timeout:500];
-        area[name="Berlin"]->.searchArea;
-
-        //nwr[public_transport=station](area.searchArea);
-        nwr(id:{0}){2}; // needs to be on two lines
-        out center;
-
+        nwr(id:{0}){2}
         nwr[amenity=bar](around.res:{1});
-        out center;
-
+        nwr[amenity=pub](around.res:{1});
+        nwr[amenity=biergarten](around.res:{1});
+        nwr[shop=alcohol](around.res:{1});
+        nwr[shop=beverages](around.res:{1});
         out center;
         """.format(
-            uid, search_radius, ";nwr._->.res" if include_searchplace else "->.res"
+            uid,
+            search_radius,
+            ";nwr._->.res;out center;" if include_searchplace else "->.res;",
         )
         try:
             response = requests.get(overpass_url, params={"data": overpass_query})
@@ -62,11 +60,13 @@ for uid in uids:
         except:
             print(
                 f"Exception occured during data query: {response.status_code}"
-                + " (Too many requests)"
-                if response.status_code == 429
-                else " (Bad request)"
-                if response.status_code == 400
-                else " (unknown cause :)"
+                + (
+                    " (Too many requests)"
+                    if response.status_code == 429
+                    else " (Bad request)"
+                    if response.status_code == 400
+                    else " (unknown cause :)"
+                )
             )  # 400 is bad request, 429 is too many requests, 200 is ok
 
         # debugging status codes

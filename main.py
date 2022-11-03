@@ -20,6 +20,7 @@ overpass_url = "http://overpass-api.de/api/interpreter"
 
 search_radius = 500
 max_search_radius = 2000
+include_shops = False
 
 # user id's (or search id's, probably a better name :) TODO rename
 uids = {
@@ -34,25 +35,22 @@ uids = {
 # uids = {678537289, 3870914569}  # for request easy testing TODO remove
 
 include_searchplace = False  # should stay that way
+sp = ";nwr._->.res;out center;" if include_searchplace else "->.res;"
 results = {}  # dict<uid: query_result["elements"]>
 
 print("Fetching Data...", end="\n" * 2)
 for uid in uids:
     search_radius = 500  # resetting search_radius
     while search_radius < max_search_radius:
-        overpass_query = """
-        [out:json][timeout:500];
-        nwr(id:{0}){2}
-        nwr[amenity=bar](around.res:{1});
-        nwr[amenity=pub](around.res:{1});
-        nwr[amenity=biergarten](around.res:{1});
-        nwr[shop=alcohol](around.res:{1});
-        nwr[shop=beverages](around.res:{1});
-        out center;
-        """.format(
-            uid,
-            search_radius,
-            ";nwr._->.res;out center;" if include_searchplace else "->.res;",
+        overpass_query = (
+            f"[out:json][timeout:500];nwr(id:{uid}){sp}(nwr[amenity=bar](around.res:{search_radius});nwr[amenity=pub](around.res:{search_radius});nwr[amenity=biergarten](around.res:{search_radius});"
+            + (")" if not include_shops else "")
+            + (
+                f"nwr[shop=alcohol](around.res:{search_radius});nwr[shop=beverages](around.res:{search_radius}););"
+                if include_shops
+                else ";"
+            )
+            + "out center;"
         )
         try:
             response = requests.get(overpass_url, params={"data": overpass_query})

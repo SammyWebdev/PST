@@ -20,7 +20,7 @@ overpass_url = "http://overpass-api.de/api/interpreter"
 
 search_radius = 500
 max_search_radius = 2000
-include_shops = False  # without this, requests hardly finish due to too many requests
+include_shops = False
 
 # user id's (or search id's, probably a better name :) TODO rename
 uids = {

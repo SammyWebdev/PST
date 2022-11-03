@@ -48,7 +48,7 @@ for uid in uids:
             + (
                 f"nwr[shop=alcohol](around.res:{search_radius});nwr[shop=beverages](around.res:{search_radius}););"
                 if include_shops
-                else ""
+                else ";"
             )
             + "out center;"
         )

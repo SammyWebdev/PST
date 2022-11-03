@@ -9,6 +9,7 @@
 
 import requests
 import json
+import geopandas
 
 overpass_url = "http://overpass-api.de/api/interpreter"
 
@@ -58,3 +59,8 @@ for uid in uids:
         if result["elements"] == []
         else result["elements"]
     )
+
+print(type(results), results)
+
+# geopandas visualisation
+# gdf = geopandas.read_file(resuts.json())

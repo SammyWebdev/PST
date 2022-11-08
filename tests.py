@@ -15,3 +15,17 @@ overpass_query = (
 )
 
 print(overpass_query)
+
+
+string = "addr:housenumber"
+
+print(string[:4])
+print(string[4:])
+
+
+addr_string = "autina nutianenu dut eui"
+
+print("pre")
+print(addr_string, end="\b")
+print("\b")
+print("post")

@@ -44,17 +44,22 @@ for uid in uids:
     while search_radius < max_search_radius:
         overpass_query = (
             f"[out:json][timeout:500];nwr(id:{uid}){sp}(nwr[amenity=bar](around.res:{search_radius});nwr[amenity=pub](around.res:{search_radius});nwr[amenity=biergarten](around.res:{search_radius});"
-            + (")" if not include_shops else "")
             + (
                 f"nwr[shop=alcohol](around.res:{search_radius});nwr[shop=beverages](around.res:{search_radius}););"
                 if include_shops
-                else ";"
+                else ");"
             )
             + "out center;"
         )
         try:
             response = requests.get(overpass_url, params={"data": overpass_query})
-            result = response.json()
+
+            try:
+                result = response.json()
+                with open("query.json", "w") as f:
+                    f.write(result)
+            except:
+                pass
         except:
             print(
                 f"Exception occured during data query: {response.status_code}"

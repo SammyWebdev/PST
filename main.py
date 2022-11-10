@@ -1,156 +1,141 @@
-# Fabi API info:
-#   Die mit den id's zu ändernde / überschreibende Liste (bei mir set, damit id-Dopplungen von vornherein ausgeschlossen sind)
-#   heißt <uids>.
-#
-#   Die Ergebnisse sind in dem dict <results> nach key=uid.
-#
-#   Der Methodenaufruf <print_per_uid_ptty(name=True)> ist nicht notwendig und nur zur Veranschaulichung der erhaltenen Daten.
-# ----------------------------------------------------------------------------------
+#import
+import csv
+import sys
+import os
+#import pandas
+import quopri
+import pandas as pd
+import geo_coding
 
+#variablen daklaration
 
-# TODO fixes:
-# - somethings I've missed :)
+Kontakt_new = []
+Kontakt=[]
+csv_file = os.path.abspath(".")+'/Kontakte.csv'
+vcf_file= os.path.abspath(".")+'/2022-10-06_151740.vcf'
+#df_Kontakte_old = pd.read_csv(csv_file)
 
-print("\n\n" + "<" + "=" * 150 + ">")
-
-import requests
-import json
-
-overpass_url = "http://overpass-api.de/api/interpreter"
-
-search_radius = 500
-max_search_radius = 2000
-include_shops = False
-
-# user id's (or search id's, probably a better name :) TODO rename
-uids = {
-    36862660,
-    86953877,
-    678537601,
-    678537289,
-    678537291,
-    3870914569,
-}  # obtained from Fabi, this is just for sample testing
-
-# uids = {678537289, 3870914569}  # for request easy testing TODO remove
-
-include_searchplace = False  # should stay that way
-sp = ";nwr._->.res;out center;" if include_searchplace else "->.res;"
-results = {}  # dict<uid: query_result["elements"]>
-
-print("Fetching Data...", end="\n" * 2)
-for uid in uids:
-    search_radius = 500  # resetting search_radius
-    while search_radius < max_search_radius:
-        overpass_query = (
-            f"[out:json][timeout:500];nwr(id:{uid}){sp}(nwr[amenity=bar](around.res:{search_radius});nwr[amenity=pub](around.res:{search_radius});nwr[amenity=biergarten](around.res:{search_radius});"
-            + (
-                f"nwr[shop=alcohol](around.res:{search_radius});nwr[shop=beverages](around.res:{search_radius}););"
-                if include_shops
-                else ");"
-            )
-            + "out center;"
-        )
-        try:
-            response = requests.get(overpass_url, params={"data": overpass_query})
-
+print("Programm start")
+#_______________decodiert die Verschlüsstelten Adress Daten aus dem vcf File
+def decode_adr(vcf_data_list,i):
+    #print('dekodiere adresse')
+    if vcf_data_list[i + 1][0] == '=': #prüft ob die Codierte message über mehrere Zeilen geht
+        #geht die Codierte Adresse über mehrere Zeilen
+        #werden diese in eine Variablen zusammengefasst um diese dann zu Decodieren
+        print('mehrere zeilen')
+        adress_data = (vcf_data_list[i].split(':')[1] + vcf_data_list[i + 1][1:])
+        adress = decode_QP(adress_data)
+    else:
+        adress = decode_QP(vcf_data_list[i].split(':')[1])
+       # print(adress)
+    return adress
+#__________________________________________decodiert den QP code und gibt diesen als String zurück____________________
+def decode_QP(str_verschlüsselt):
+    temp3 = quopri.decodestring(str_verschlüsselt)
+    temp3 = temp3.decode('utf-8')
+    temp3 = temp3.split(';')[2]
+    return temp3
+#________________________________________liest die Kontaktdatei vom Handy aus______________________
+def vcf_read():
+    data = {
+        'Name': [None],
+        'Tel': [None],
+        'Street': [None],
+        'Hausnummer': [None],
+        'Ort': [None],
+        'Plz': [None]
+    }
+    dfKontakte = pd.read_csv(csv_file)
+    #print(dfKontakte)
+    with open(vcf_file, mode='r') as vcf: #öffnet die vcf datei mit den Kontakte
+        vcf_data = vcf.read()   #liest vcf file aus
+        vcf_data_list = vcf_data.splitlines()#trennt ausgelesenden file nach zeilen
+        i = 0
+        adresse = []
+        while i+1 < len(vcf_data_list) :#durchläuft einmal ganze liste
+            name = 's'
+            #tel='s'
             try:
-                result = response.json()
-                with open("query.json", "w") as f:
-                    f.write(result)
-            except:
-                pass
-        except:
-            print(
-                f"Exception occured during data query: {response.status_code}"
-                + (
-                    " (Too many requests)"
-                    if response.status_code == 429
-                    else " (Bad request)"
-                    if response.status_code == 400
-                    else " (unknown cause :)"
-                )
-            )  # 400 is bad request, 429 is too many requests, 200 is ok
 
-        # debugging status codes
-        # print(f"status: {response.status_code}")
+                if(vcf_data_list[i][0]+(vcf_data_list[i][1])+(vcf_data_list[i][2]))== 'ADR': #sucht Positionen die mit ADR beginnen in Liste (Zeichen für Adresse)
+                    if('QUOTED-PRINTABLE' in vcf_data_list[i]):
+                        #print(i)
+                        adresse.append(decode_adr(vcf_data_list,i))
+   #Kontakt_new.append(tempkontakt)
+                    else:
+                        adresse.append(vcf_data_list[i].split(';')[3])
+                    #print(i)
+                    #print(len(adresse))
+                    if len(adresse) ==2 :
 
-        # dealing with empty result
-        if result["elements"] == []:
-            search_radius += 500  # expanding search radius
-        else:
-            # print("debug", result)
-            break  # stops further querying
-
-    results[uid] = (
-        f"No results {search_radius}m near uid {uid} !"
-        if result["elements"] == []
-        else result["elements"]
-    )
-
-
-def print_per_uid():
-    for uid in uids:
-        print(
-            f"(uid={uid}):",
-            str(results[uid])[:1000],
-            "\b..." if len(str(str(results[uid]))) > 999 else "\b",
-            end="\n" * 2,
-        )
-
-
-def print_per_uid_ptty(name=False):  # pretty prints the results
-    for uid in uids:
-        print(f"(uid={uid}):")
-        try:
-            for element in results[uid]:
-                if name:
-                    print(
-                        "\t{} (eid={})".format(element["tags"]["name"], element["id"]),
-                        end="",
-                    )
-                    try:
-                        found_addr = False
-                        addr_string = ', Address: "'
-                        print(addr_string, end="")
-                        addr = {  # possible address components
-                            "city": "_",
-                            "country": "_",
-                            "housenumber": "_",
-                            "postcode": "_",
-                            "street": "_",
-                        }
-                        tags = element["tags"]
-                        for tag_key, _ in tags.items():
-                            if tag_key[:4] == "addr":  # finds address components
-                                found_addr = True
-                                addr[tag_key[5:]] = tags[tag_key]
-                                # print("debug:", addr, tag_key)
+                        x = i
+                        while not vcf_data_list[x][:3] in 'TEL':
+                            x = x-1
+                        tel =  vcf_data_list[x].split(':')[1]
+                        name = vcf_data_list[x-1].split(':')[1]
+                        ort = adresse[1].split(' ')
+                        straße_l = adresse[0].split(' ')
+                        street_name = ''
+                        Ort_name = ''
+                        for t in ort:
+                            if t.isdigit():
+                                plz = t
                             else:
-                                pass  # key isn't part of an address
-                        if found_addr:
-                            print(
-                                addr["street"],
-                                addr["housenumber"],
-                                addr["postcode"],
-                                addr["city"],
-                                end='"\n',
-                            )
-                        else:
-                            print('No Address given."')
-                    except:
-                        # print("Element doesn't have tags")
-                        pass
-                else:
-                    pass
-                    # print("\t(eid={}): {}".format(element.get("id"), element))
-        except:
-            print(f"\t{results[uid]}")  # when there are no results
-
-        print("-" * 50)
-
-
-print_per_uid_ptty(name=True)
-
-# debugging
-# print(results)
+                                Ort_name = Ort_name + ' ' + t
+                        for t in straße_l:
+                            if t.isdigit():
+                                hausnummer_i = t
+                            else:
+                                street_name = street_name + ' ' + t
+                        data = {
+                            'Name': [name],
+                            'Tel': [tel],
+                            'Street': [street_name],
+                            'Hausnummer': [hausnummer_i],
+                            'Ort': [Ort_name],
+                            'Plz': [plz]
+                        }
+                        #print(name)
+                        new = kontakt_new_test(name,dfKontakte)
+                        if new:
+                            print('neuer Kontakt gefunden')
+                            df2 = pd.DataFrame(data)
+                         #   print(df2)
+                            dfKontakte = dfKontakte.append(df2)
+                        #print(dfKontakte)
+                        adresse = []
+            except Exception as e:
+                print(e)
+                # print(name)
+                #print('df2')
+            i = i+1
+    dfKontakte.to_csv(csv_file,index = False)
+    return dfKontakte
+    x = 0
+def kontakt_new_test(name,df_Kontakte):
+    #kontrolliert ob der neue Kontakt bereits vorhanden ist und
+    # gibt dementsprechend True oder False zurück
+    kontakt_vorhanden = False;
+    for i, row in df_Kontakte.iterrows():
+        #print(row)
+        if row.get('Name') == name:
+            print('der Kontakt ist bereits vorhanden')
+            kontakt_vorhanden = True
+    if not kontakt_vorhanden:
+        print('neuen Kontakt speichern')
+        return True
+    else:
+        return False
+#_____________fals noch keine csv vorhanden ist wird diese Hier erstellt
+#prüfung ob vorhanden in in arbeit
+def create_new_csv():
+    print('create new csv')
+    with open(csv_file, 'w', encoding='utf-8') as csv_datei:
+        writer = csv.writer(csv_datei, delimiter=',')
+        writer.writerow(['Name','Nummer', 'Straße', 'Hausnummer','Ort','Plz'])
+def main():
+    #create_new_csv()
+    dfkontakte = vcf_read()
+    dfkontakte = loade_csv()
+    geo_coding.main_geo_coding(dfkontakte)
+main()

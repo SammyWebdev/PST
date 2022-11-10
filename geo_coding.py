@@ -1,15 +1,13 @@
 import pandas as pd
 import folium
-from folium.plugins import MarkerCluster
 from geopy.geocoders import Nominatim
-import osm
-def main_geo_coding(dfkontakte):
+
+def get_osm_id(dfkontakte):
     print('geo coding start')
     print(dfkontakte.shape)
     List = get_coordinates(dfkontakte)
     osm_id_list =search_around(List)
-    for uid in osm_id_list:
-        osm.search_near_by(uid)
+    return osm_id_list
 def search_around(list):
     print('hi')
     locator = Nominatim(user_agent="myGeocoder")
@@ -37,6 +35,7 @@ def get_coordinates(dfkontakte):
         ort = dfkontakte.loc[i].get('Ort')
         Street = dfkontakte.loc[i].get('Street')
         Hausnummer = dfkontakte.loc[i].get('Hausnummer')
+        #print(dfkontakte)
         adresse = ort + ' ' + str(Plz).split('.')[0] + ' ' + Street + ' ' + str(Hausnummer).split('.')[0]
         #print(adresse)
         getLoc = loc.geocode(adresse) #liest geo daten aus

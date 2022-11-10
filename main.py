@@ -6,8 +6,8 @@ import os
 import quopri
 import pandas as pd
 import geo_coding
-
-#variablen daklaration
+import osm
+# variablen daklaration
 
 Kontakt_new = []
 Kontakt=[]
@@ -133,9 +133,15 @@ def create_new_csv():
     with open(csv_file, 'w', encoding='utf-8') as csv_datei:
         writer = csv.writer(csv_datei, delimiter=',')
         writer.writerow(['Name','Nummer', 'Straße', 'Hausnummer','Ort','Plz'])
+def loade_csv():
+    print('loade csv')
+    return pd.read_csv('Kontakte.csv')
 def main():
     #create_new_csv()
-    dfkontakte = vcf_read()
+    #dfkontakte = vcf_read()
     dfkontakte = loade_csv()
-    geo_coding.main_geo_coding(dfkontakte)
+    osm_ids_kontakte = geo_coding.get_osm_id(dfkontakte)
+    date_dict = osm.osm_main(osm_ids_kontakte)
+    osm.print_per_uid(date_dict)
+
 main()

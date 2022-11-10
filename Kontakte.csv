@@ -1,6 +1,6 @@
 Name,Tel,Street,Hausnummer,Ort,Plz,
-Test,+49 163 7546485, Friedrich Engels Straße,25,0, Königs Wusterhausen,15711
-Bbb,+49 164 6456, Zanderstraße,10,0, Brandenburg,14770
-Aaa,+49 163 876249, Lindenring,65,0, Ragow,15749
-Testi,+49 163 18413, Lindenring,70,0, Ragow,15749
-KeinPlan,+49 165 12342239, Lindenring,72,0, Ragow,15749
+Test,+49 163 7546485, Friedrich Engels Straße,25, Königs Wusterhausen,15711
+Bbb,+49 164 6456, Zanderstraße,10, Brandenburg,14770
+Aaa,+49 163 876249, Lindenring,65, Ragow,15749
+Testi,+49 163 18413, Lindenring,70, Ragow,15749
+KeinPlan,+49 165 12342239, Lindenring,72, Ragow,15749

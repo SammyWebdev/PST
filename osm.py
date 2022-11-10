@@ -7,7 +7,9 @@
 #   Der Methodenaufruf <print_per_uid_ptty(name=True)> ist nicht notwendig und nur zur Veranschaulichung der erhaltenen Daten.
 # ----------------------------------------------------------------------------------
 
-
+def osm_main(osm_id_list):
+    print('osm_main_start')
+    return search_near_by(osm_id_list)
 # TODO fixes:
 # - somethings I've missed :)
 
@@ -33,60 +35,61 @@ uids = {
 }  # obtained from Fabi, this is just for sample testing
 
 # uids = {678537289, 3870914569}  # for request easy testing TODO remove
-
-include_searchplace = False  # should stay that way
-sp = ";nwr._->.res;out center;" if include_searchplace else "->.res;"
 results = {}  # dict<uid: query_result["elements"]>
+def search_near_by(osm_id_list):
+    print('start search near by')
+    include_searchplace = False  # should stay that way
+    sp = ";nwr._->.res;out center;" if include_searchplace else "->.res;"
 
-print("Fetching Data...", end="\n" * 2)
-for uid in uids:
-    search_radius = 500  # resetting search_radius
-    while search_radius < max_search_radius:
-        overpass_query = (
-            f"[out:json][timeout:500];nwr(id:{uid}){sp}(nwr[amenity=bar](around.res:{search_radius});nwr[amenity=pub](around.res:{search_radius});nwr[amenity=biergarten](around.res:{search_radius});"
-            + (
-                f"nwr[shop=alcohol](around.res:{search_radius});nwr[shop=beverages](around.res:{search_radius}););"
-                if include_shops
-                else ");"
-            )
-            + "out center;"
-        )
-        try:
-            response = requests.get(overpass_url, params={"data": overpass_query})
-
-            try:
-                result = response.json()
-                with open("query.json", "w") as f:
-                    f.write(result)
-            except:
-                pass
-        except:
-            print(
-                f"Exception occured during data query: {response.status_code}"
+    print("Fetching Data...", end="\n" * 2)
+    for uid in osm_id_list:
+        search_radius = 500  # resetting search_radius
+        while search_radius < max_search_radius:
+            overpass_query = (
+                f"[out:json][timeout:500];nwr(id:{uid}){sp}(nwr[amenity=bar](around.res:{search_radius});nwr[amenity=pub](around.res:{search_radius});nwr[amenity=biergarten](around.res:{search_radius});"
                 + (
-                    " (Too many requests)"
-                    if response.status_code == 429
-                    else " (Bad request)"
-                    if response.status_code == 400
-                    else " (unknown cause :)"
+                    f"nwr[shop=alcohol](around.res:{search_radius});nwr[shop=beverages](around.res:{search_radius}););"
+                    if include_shops
+                    else ");"
                 )
-            )  # 400 is bad request, 429 is too many requests, 200 is ok
+                + "out center;"
+            )
+            try:
+                response = requests.get(overpass_url, params={"data": overpass_query})
 
-        # debugging status codes
-        # print(f"status: {response.status_code}")
+                try:
+                    result = response.json()
+                    with open("query.json", "w") as f:
+                        f.write(result)
+                except:
+                    pass
+            except:
+                print(
+                    f"Exception occured during data query: {response.status_code}"
+                    + (
+                        " (Too many requests)"
+                        if response.status_code == 429
+                        else " (Bad request)"
+                        if response.status_code == 400
+                        else " (unknown cause :)"
+                    )
+                )  # 400 is bad request, 429 is too many requests, 200 is ok
 
-        # dealing with empty result
-        if result["elements"] == []:
-            search_radius += 500  # expanding search radius
-        else:
-            # print("debug", result)
-            break  # stops further querying
+            # debugging status codes
+            # print(f"status: {response.status_code}")
 
-    results[uid] = (
-        f"No results {search_radius}m near uid {uid} !"
-        if result["elements"] == []
-        else result["elements"]
-    )
+            # dealing with empty result
+            if result["elements"] == []:
+                search_radius += 500  # expanding search radius
+            else:
+                # print("debug", result)
+                break  # stops further querying
+
+        results[uid] = (
+            f"No results {search_radius}m near uid {uid} !"
+            if result["elements"] == []
+            else result["elements"]
+        )
 
 
 def print_per_uid():
@@ -150,7 +153,7 @@ def print_per_uid_ptty(name=False):  # pretty prints the results
         print("-" * 50)
 
 
-print_per_uid_ptty(name=True)
+
 
 # debugging
 # print(results)

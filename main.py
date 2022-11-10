@@ -159,8 +159,9 @@ def main():
     # dfkontakte = vcf_read()
     dfkontakte = loade_csv()
     osm_ids_kontakte = geo_coding.get_osm_id(dfkontakte)
-    date_dict = osm.osm_main(osm_ids_kontakte)
-    osm.print_per_uid_ptty(name=True)
+    results = osm.osm_main(osm_ids_kontakte)
+    osm.print_per_uid_ptty(osm_ids_kontakte)
+    # osm.print_per_uid_ptty(osm_ids_kontakte, name=False)
 
 
 main()

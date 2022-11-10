@@ -20,7 +20,7 @@ import json
 import time
 
 # user id's (or search id's, probably a better name :) TODO rename
-uids = {
+sample_uids = {
     36862660,
     86953877,
     678537601,
@@ -48,7 +48,7 @@ def search_near_by(osm_id_list):
     print("Fetching Data...", end="\n" * 2)
     for uid in osm_id_list:
         search_radius = 500  # resetting search_radius
-        while search_radius < max_search_radius:
+        while search_radius <= max_search_radius:
             print(f"For uid={uid}: sending query with radius={search_radius}")
             overpass_query = (
                 f"[out:json][timeout:500];nwr(id:{uid}){sp}(nwr[amenity=bar](around.res:{search_radius});nwr[amenity=pub](around.res:{search_radius});nwr[amenity=biergarten](around.res:{search_radius});"
@@ -93,9 +93,11 @@ def search_near_by(osm_id_list):
             else result["elements"]
         )
 
+    return results
+
 
 # TODO remove or fix
-def print_per_uid():
+def print_per_uid(uids):
     print("print_per_uid()")
     for uid in uids:
         print(
@@ -106,67 +108,71 @@ def print_per_uid():
         )
 
 
-def print_per_uid_ptty(name=False):  # pretty prints the results
+def print_per_uid_ptty(uids, name=True):  # pretty prints the results
     print(f"print_per_uid_ptty(name={name})")
     for uid in uids:
         print(f"(uid={uid}):")
-        try:
-            if type(results[uid]) == str:  # ...means there weren't any results
-                print(f"\t{results[uid]}")
-            else:
-                for element in results[uid]:
-                    if name:
-                        try:
-                            print(
-                                "\t{} (eid={})".format(
-                                    element["tags"]["name"], element["id"]
-                                ),
-                                end="",
-                            )  # TODO check if putting it in here was neccessary... befor it was directly after name
-                            found_addr = False
-                            addr_string = ', Address: "'
-                            print(addr_string, end="")
-                            addr = {  # possible address components
-                                "city": "_",
-                                "country": "_",
-                                "housenumber": "_",
-                                "postcode": "_",
-                                "street": "_",
-                            }
-                            tags = element["tags"]
-                            for tag_key, _ in tags.items():
-                                if tag_key[:4] == "addr":  # finds address components
-                                    found_addr = True
-                                    addr[tag_key[5:]] = tags[tag_key]
-                                    # print("debug:", addr, tag_key)
-                                else:
-                                    pass  # key isn't part of an address
-                            if found_addr:
-                                print(
-                                    addr["street"],
-                                    addr["housenumber"],
-                                    addr["postcode"],
-                                    addr["city"],
-                                    end='"\n',
-                                )
+
+        # TODO reintroduce try except
+        # try:
+        if type(results[uid]) == str:  # ...means there weren't any results
+            print(f"\t{results[uid]}")
+        else:
+            for element in results[uid]:
+                if name:
+                    try:
+                        print(
+                            "\t{} (eid={})".format(
+                                element["tags"]["name"], element["id"]
+                            ),
+                            end="",
+                        )  # TODO check if putting it in here was neccessary... befor it was directly after name
+                        found_addr = False
+                        addr_string = ', Address: "'
+                        print(addr_string, end="")
+                        addr = {  # possible address components
+                            "city": "_",
+                            "country": "_",
+                            "housenumber": "_",
+                            "postcode": "_",
+                            "street": "_",
+                        }
+                        tags = element["tags"]
+                        for tag_key, _ in tags.items():
+                            if tag_key[:4] == "addr":  # finds address components
+                                found_addr = True
+                                addr[tag_key[5:]] = tags[tag_key]
+                                # print("debug:", addr, tag_key)
                             else:
-                                print('No Address given."')
-                        except:
-                            # print("Element doesn't have tags")
-                            print(f"\tError occured with element:{element}")
-                            pass
-                    else:
-                        print("\t(eid={}): {}".format(element.get("id"), element))
-        except Exception as e:
-            print(f"Exception occured while printing results: {e}")
-            # print(f"\t{results[uid]}")  # when there are no results
+                                pass  # key isn't part of an address
+                        if found_addr:
+                            print(
+                                addr["street"],
+                                addr["housenumber"],
+                                addr["postcode"],
+                                addr["city"],
+                                end='"\n',
+                            )
+                        else:
+                            print('No Address given."')
+                    except:
+                        # print("Element doesn't have tags")
+                        print(
+                            f"\tError occured with element:{element}\n...likely doesn't have a name tagged"
+                        )
+                else:
+                    print("\t(eid={}): {}".format(element.get("id"), element))
+
+        # except Exception as e:
+        #     print(f"\tException occured while printing results: {e}")
+        #     print(f"\t{results[uid]}")  # when there are no results
 
         print("-" * 50)
 
 
 if __name__ == "__main__":
-    osm_main(uids)
-    print_per_uid_ptty(name=True)
+    osm_main(sample_uids)
+    print_per_uid_ptty(sample_uids)
 
 # debugging
 # print(results)

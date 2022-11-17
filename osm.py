@@ -97,7 +97,7 @@ def search_near_by(osm_id_list):
 
 
 # TODO remove or fix
-def print_per_uid(uids):
+def print_per_uid(uids,results):
     print("print_per_uid()")
     for uid in uids:
         print(
@@ -125,6 +125,7 @@ def print_per_uid_ptty(uids, name=True):  # pretty prints the results
                             "\t{} (eid={})".format(
                                 element["tags"]["name"], element["id"]
                             ),
+
                             end="",
                         )  # TODO check if putting it in here was neccessary... befor it was directly after name
                         found_addr = False
@@ -154,6 +155,7 @@ def print_per_uid_ptty(uids, name=True):  # pretty prints the results
                                 end='"\n',
                             )
                         else:
+
                             print('No Address given."')
                     except:
                         # print("Element doesn't have tags")
@@ -168,7 +170,6 @@ def print_per_uid_ptty(uids, name=True):  # pretty prints the results
         #     print(f"\t{results[uid]}")  # when there are no results
 
         print("-" * 50)
-
 
 if __name__ == "__main__":
     osm_main(sample_uids)

@@ -7,7 +7,7 @@ def get_osm_id(dfkontakte):
     print(dfkontakte.shape)
     List = get_coordinates(dfkontakte)
     osm_id_list =search_around(List)
-    return osm_id_list
+    return osm_id_list,List
 def search_around(list):
     print('hi')
     locator = Nominatim(user_agent="myGeocoder")

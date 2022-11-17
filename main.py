@@ -8,11 +8,13 @@ import quopri
 import pandas as pd
 import geo_coding
 import osm
+import website
 
 # variablen daklaration
 
 Kontakt_new = []
 Kontakt = []
+kontakte_daten = []
 csv_file = os.path.abspath(".") + "/Kontakte.csv"
 vcf_file = os.path.abspath(".") + "/2022-10-06_151740.vcf"
 # df_Kontakte_old = pd.read_csv(csv_file)
@@ -158,9 +160,10 @@ def main():
     # create_new_csv()
     # dfkontakte = vcf_read()
     dfkontakte = loade_csv()
-    osm_ids_kontakte = geo_coding.get_osm_id(dfkontakte)
+    osm_ids_kontakte,kontakte_daten = geo_coding.get_osm_id(dfkontakte)
     results = osm.osm_main(osm_ids_kontakte)
-    osm.print_per_uid_ptty(osm_ids_kontakte)
+    #osm.print_per_uid_ptty(osm_ids_kontakte,results)
+    website.show_at_map(osm_ids_kontakte,results,kontakte_daten)
     # osm.print_per_uid_ptty(osm_ids_kontakte, name=False)
 
 

@@ -25,7 +25,7 @@ def show_at_map(uids,results,kontakte_daten,name = True):
                         name = element["tags"]["name"]
                         folium.Marker([lat,lon],popup="<i>Mt. Hood Meadows</i>", tooltip=name).add_to(my_map)
                 except:
-                    # print("Element doesn't have tags")
+                    # print("Element doesn't have dtags")
                     print(
                         f"\tError occured with element:{element}\n...likely doesn't have a name tagged"
                     )

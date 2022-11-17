@@ -23,6 +23,9 @@ def show_at_map(uids,results,kontakte_daten,name = True):
                         lon = element['lon']
                         lat = element['lat']
                         name = element["tags"]["name"]
+                        #Todo BUS und Bar marker unterschied Fabi
+                        # bar Öffungszeiten und web adresse anzeigen Fabi
+
                         folium.Marker([lat,lon],popup="<i>Mt. Hood Meadows</i>", tooltip=name).add_to(my_map)
                 except:
                     # print("Element doesn't have dtags")
@@ -33,6 +36,7 @@ def show_at_map(uids,results,kontakte_daten,name = True):
         lon = elements[2][1]
         lat = elements[2][0]
         name = elements[0]
+        #TODO kontakt telefonnummer anzeigen, bei anklicken Fabi
         folium.Marker([lat, lon], popup="<i>Mt. Hood Meadows</i>", tooltip=name).add_to(my_map)
     folium.LayerControl().add_to(my_map)
     my_map.save('map.html')

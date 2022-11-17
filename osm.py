@@ -6,7 +6,7 @@
 #
 #   Der Methodenaufruf <print_per_uid_ptty(name=True)> ist nicht notwendig und nur zur Veranschaulichung der erhaltenen Daten.
 # ----------------------------------------------------------------------------------
-
+#Todo bus in der nähe anzeigen Jeremie
 
 def osm_main(osm_id_list):
     print("osm_main()")
@@ -33,7 +33,7 @@ sample_uids = {
 
 results = {}  # dict<uid: query_result["elements"]>
 
-
+#todo amenity as param
 def search_near_by(osm_id_list):
     overpass_url = "http://overpass-api.de/api/interpreter"
     search_radius = 500

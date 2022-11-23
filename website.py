@@ -3,7 +3,7 @@ import osmapi as osm
 import folium
 import codecs
 
-def show_at_map(uids,results,kontakte_daten,name = True):
+def show_at_map(uids, results, kontakte_daten, name = True, min_width=None, max_width=None):
     print("show at map")
     bereich = [51.879092, 9.640534]
     my_map = folium.Map(location=bereich, zoom_start=7.5)
@@ -21,12 +21,30 @@ def show_at_map(uids,results,kontakte_daten,name = True):
                     print(element)
                     if name:
                         lon = element['lon']
+                     #   print(24)
                         lat = element['lat']
+                      #  print(26)
                         name = element["tags"]["name"]
-                        #Todo BUS und Bar marker unterschied Fabi
+                       # print(28)
+                        amenity = element["tags"]['amenity']
+                    #    print(30)
+                        icon = choose_icon(amenity)
+                        print(32)
+                        try :
+                            website = element['tags']['website']
+                            print(website)
+                            folium.Marker([lat, lon],
+                                          icon=folium.CustomIcon(icon, icon_size=(15, 15), icon_anchor=(15, 15)),
+                                          popup='Website: ' + website, tooltip=name).add_to(my_map)
+                        except:
+                            folium.Marker([lat, lon],
+                                          icon=folium.CustomIcon(icon, icon_size=(15, 15), icon_anchor=(15, 15)),
+                                          popup="<i>Error 404 keine Website hinterlegt </i>", tooltip=name).add_to(my_map)
+                            print('keine Website')
                         # bar Öffungszeiten und web adresse anzeigen Fabi
+                      #  print(34)
+                     #   print('icon: ' + icon)
 
-                        folium.Marker([lat,lon],popup="<i>Mt. Hood Meadows</i>", tooltip=name).add_to(my_map)
                 except:
                     # print("Element doesn't have dtags")
                     print(
@@ -36,8 +54,20 @@ def show_at_map(uids,results,kontakte_daten,name = True):
         lon = elements[2][1]
         lat = elements[2][0]
         name = elements[0]
-        #TODO kontakt telefonnummer anzeigen, bei anklicken Fabi
-        folium.Marker([lat, lon], popup="<i>Mt. Hood Meadows</i>", tooltip=name).add_to(my_map)
+        tel = elements[1]
+        print(tel)
+        folium.Marker([lat, lon], popup = folium.Popup("Tel: " +tel, parse_html=True, max_width=200) , tooltip=name).add_to(my_map)
     folium.LayerControl().add_to(my_map)
     my_map.save('map.html')
     webbrowser.open("map.html")
+
+def choose_icon(amenity):
+    print('amenity: ' + amenity)
+    if amenity == "bar":
+        return 'bier.png'
+    elif amenity == "biergarten":
+        return "bier.png"
+    elif amenity == "bus_station":
+        return 'bus.png'
+    elif amenity == "pub":
+        return "bier.png"

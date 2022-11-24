@@ -16,7 +16,7 @@ Kontakt_new = []
 Kontakt = []
 kontakte_daten = []
 csv_file = os.path.abspath(".") + "/Kontakte.csv"
-vcf_file = os.path.abspath(".") + "/2022-10-06_151740.vcf"
+vcf_file = os.path.abspath(".") + "/kontakte.vcf"
 # df_Kontakte_old = pd.read_csv(csv_file)
 
 print("Programm start")
@@ -122,7 +122,7 @@ def vcf_read():
                 # print('df2')
             i = i + 1
     dfKontakte.to_csv(csv_file, index=False)
-    return dfKontakte
+
     x = 0
 
 
@@ -158,7 +158,7 @@ def loade_csv():
 
 def main(search_parameter):
     # create_new_csv()
-    # dfkontakte = vcf_read()
+    #dfkontakte = vcf_read()
     dfkontakte = loade_csv()
     osm_ids_kontakte,kontakte_daten = geo_coding.get_osm_id(dfkontakte)
     results = osm.osm_main(osm_ids_kontakte)

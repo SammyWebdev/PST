@@ -1,5 +1,4 @@
-#Todo interface zur bedinung über website
-#TODO auswahlmöglichkeit für amenitys
+
 from flask import Flask, render_template, request
 from pathlib import Path
 import os
@@ -45,11 +44,12 @@ def start_screen():
         return render_template(start_Website)
 @app.route("/upload_kontakte",methods=['POST','GET'])
 def uploade():
+    print('uploade Website')
     f = request.files.get('file')  # empfängt neuen file
     if f:
         file_path = Path(os.path.abspath("."), 'kontakte.vcf')
         f.save(file_path)
-    print('uploade Website')
+    main.vcf_read()
     return render_template(uploade_website)
 
 

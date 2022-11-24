@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Uploade</title>
+</head>
+<body>
+  <form mehtod="post" action="/" >
+        <input type="submit" name="home" value="home">
+  </form>
+ <neue_kontakte class ='neue_kontakte' method="post" action="/upload_kontakte" >
+
+
+    <p> Neue Kontake Hinzufügen: </p>
+     {{ dropzone.create(action='uploade') }}
+    {{ dropzone.load_js() }}
+    {{ dropzone.config() }}
+    {{ dropzone.style('
+        max-width: 1576px;
+        height: 72px;
+        padding: 24px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: "Roboto", sans-serif;
+        font-weight: 400;
+        font-size: 12px;
+        cursor: pointer;
+        color: #cccccc;
+        border: dashed;
+        border-radius: 4px;
+    ')}}
+    {# You can get the success response from server like this: #}
+    {#{ dropzone.config(custom_options="success: function(file, response){console.log(response);}") }#}
+        </neue_kontakte>
+</body>
+</html>

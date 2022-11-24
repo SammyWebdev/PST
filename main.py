@@ -156,7 +156,7 @@ def loade_csv():
     return pd.read_csv("Kontakte.csv")
 
 
-def main():
+def main(search_parameter):
     # create_new_csv()
     # dfkontakte = vcf_read()
     dfkontakte = loade_csv()
@@ -167,4 +167,4 @@ def main():
     # osm.print_per_uid_ptty(osm_ids_kontakte, name=False)
 
 
-main()
+

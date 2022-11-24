@@ -1,3 +1,4 @@
+import os
 import webbrowser
 import osmapi as osm
 import folium
@@ -58,8 +59,9 @@ def show_at_map(uids, results, kontakte_daten, name = True, min_width=None, max_
         print(tel)
         folium.Marker([lat, lon], popup = folium.Popup("Tel: " +tel, parse_html=True, max_width=200) , tooltip=name).add_to(my_map)
     folium.LayerControl().add_to(my_map)
-    my_map.save('map.html')
-    webbrowser.open("map.html")
+    template_FOLDER = os.path.join(os.getcwd(), 'template/map.html')
+    my_map.save(template_FOLDER)
+    #webbrowser.open("map.html")
 
 def choose_icon(amenity):
     print('amenity: ' + amenity)

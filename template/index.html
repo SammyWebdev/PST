@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Freunde sucher</title>
+</head>
+<body>
+     <form method="post" action="start_screen" style="visibility: {{start_screen_display}}">
+          <input type="submit" name="New_Kontakts" value="new Kontakt" style="visibility: {{start_screen_display}}">
+          <input type="submit" name="berechnen" value="suchen" style="visibility: {{start_screen_display}}">
+         <suche>
+             <input type="checkbox" name="checkbox_parameter" value="bars" checked> Bars
+             <input type="checkbox" name="checkbox_parameter" value="haltestelle" checked> Haltestelle
+             <input type="checkbox" name="checkbox_parameter" value="einkaufsladen" checked> Einkaufsladen
+         </suche>
+    </form>
+    <form mehtod="post" action="/" >
+        <input type="submit" name="home" value="home">
+    </form>
+</body>
+</html>
